@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  linebot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/app
+    command: /app/scripts/start.sh
+    entrypoint: /app/scripts/entrypoint.sh
+    restart: always
+    networks:
+      - stats-linebot
+      - gateway
+
+      

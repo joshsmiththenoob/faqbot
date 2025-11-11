@@ -9,7 +9,6 @@ from rapidfuzz import fuzz, process
 
 CHANNEL_SECRET = os.getenv("LINE_CHANNEL_SECRET")
 CHANNEL_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
-print(CHANNEL_SECRET, CHANNEL_ACCESS_TOKEN)
 line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(CHANNEL_SECRET)
 
@@ -20,10 +19,13 @@ def _send_long_text(line_bot_api, reply_token, text, max_len=1800):
     cur_len = 0
     for line in text.splitlines(True):  # 保留換行
         if cur_len + len(line) > max_len:
-            parts.append("".join(cur)); cur = [line]; cur_len = len(line)
+            parts.append("".join(cur))
+            cur = [line]; cur_len = len(line)
         else:
-            cur.append(line); cur_len += len(line)
-    if cur: parts.append("".join(cur))
+            cur.append(line)
+            cur_len += len(line)
+    if cur: 
+        parts.append("".join(cur))
     from linebot.models import TextSendMessage
     msgs = [TextSendMessage(text=p) for p in parts]
     line_bot_api.reply_message(reply_token, msgs if len(msgs) > 1 else msgs[0])
@@ -42,9 +44,12 @@ def _match(user_text: str, faqs):
     universe, idx_map = [], []
     for i, f in enumerate(faqs):
         for phr in [f.question, *f.aliases]:
-            if phr: universe.append(phr); idx_map.append(i)
+            if phr: 
+                universe.append(phr) 
+                idx_map.append(i)
 
     ranked = process.extract(t, universe, scorer=fuzz.WRatio, limit=5)
+    print(ranked)
     scores = {}
     for phr, sc, uidx in ranked:
         f = faqs[idx_map[uidx]]
@@ -58,8 +63,8 @@ def _match(user_text: str, faqs):
 
 @csrf_exempt
 def callback(request):
-    print("SECRET head:", (CHANNEL_SECRET or "")[:6], "len:", len(CHANNEL_SECRET or "0"))
-    print("TOKEN head:", (CHANNEL_ACCESS_TOKEN or "")[:6], "len:", len(CHANNEL_ACCESS_TOKEN or "0"))
+    # print("SECRET head:", (CHANNEL_SECRET or "")[:6], "len:", len(CHANNEL_SECRET or "0"))
+    # print("TOKEN head:", (CHANNEL_ACCESS_TOKEN or "")[:6], "len:", len(CHANNEL_ACCESS_TOKEN or "0"))
     if not CHANNEL_SECRET:
         raise RuntimeError("LINE_CHANNEL_SECRET is missing. Check .env")
 

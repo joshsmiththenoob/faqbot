@@ -3,19 +3,23 @@ import environ
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = environ.Path(__file__) - 3
+BASE_DIR = environ.Path(__file__) - 4
 
-
+print("-----------基礎資料夾------------", BASE_DIR)
 # Load operating system environment variables and then prepare to use them
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))  # 讀剛建立的 .env
+# environ.Env.read_env(os.path.join(BASE_DIR, ".env"))  # 讀剛建立的 .env
+# Read a optional env file if not configure from environment variables
+if os.path.exists(BASE_DIR('.env')):
+    environ.Env.read_env(BASE_DIR('.env'))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7xvc9^janvir=kyto0rar9orfg9hfb25vx8$7l-!pd_(zox05j'
+# SECRET_KEY = 'django-insecure-7xvc9^janvir=kyto0rar9orfg9hfb25vx8$7l-!pd_(zox05j'
+SECRET_KEY = env.str('SECRECT_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "pgvector.django",
-    "faq",
+    "apps.faq",
 ]
 
 MIDDLEWARE = [
@@ -50,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'stats_linebot.urls'
+ROOT_URLCONF = 'dashboard.urls'
 
 TEMPLATES = [
     {
@@ -68,7 +72,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'stats_linebot.wsgi.application'
+WSGI_APPLICATION = "dashboard.wsgi.application"
+ASGI_APPLICATION = "dashboard.configs.asgi.application"
 
 
 # Database
