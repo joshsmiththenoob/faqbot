@@ -3,15 +3,17 @@ import environ
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = environ.Path(__file__) - 4
-
+BASE_DIR = Path(__file__).resolve().parents[2]
 print("-----------基礎資料夾------------", BASE_DIR)
+
 # Load operating system environment variables and then prepare to use them
 env = environ.Env()
 # environ.Env.read_env(os.path.join(BASE_DIR, ".env"))  # 讀剛建立的 .env
 # Read a optional env file if not configure from environment variables
-if os.path.exists(BASE_DIR('.env')):
-    environ.Env.read_env(BASE_DIR('.env'))
+project_root = BASE_DIR.parent
+env_file = project_root / ".env"
+if env_file.exists():
+    env.read_env(env_file)
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,9 +26,9 @@ SECRET_KEY = env.str('SECRECT_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.str("POSTGRES_DB", default='')
 
-ALLOWED_HOSTS = env.list("CSRF_TRUSTED_ORIGINS", default=["127.0.0.1"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1"])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["https://127.0.0.1"])
-
+print("ALLOWED_HOSTS: ", ALLOWED_HOSTS)
 # Application definition
 
 INSTALLED_APPS = [
@@ -140,7 +142,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Development/Production enviroment settings
-
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles" # Let Django collects where we put all static files to (ex: project's root folder) when we run the collectstatic commond by manage.py
 # It's going to allow us to host our static files using Nginx

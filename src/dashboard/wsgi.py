@@ -11,7 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dashboard.configs.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dashboard.configs.dev")
 
 """
 python -m gunicorn -w 8 -b 0.0.0.0:8081 \
