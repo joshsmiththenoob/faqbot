@@ -26,7 +26,6 @@ def _send_long_text(line_bot_api, reply_token, text, max_len=1800):
             cur_len += len(line)
     if cur: 
         parts.append("".join(cur))
-    from linebot.models import TextSendMessage
     msgs = [TextSendMessage(text=p) for p in parts]
     line_bot_api.reply_message(reply_token, msgs if len(msgs) > 1 else msgs[0])
 
@@ -86,7 +85,7 @@ def callback(request):
         events = parser.parse(body, signature)
     except InvalidSignatureError:
         # 簽章不對：回 200，避免 Verify 失敗；同時方便你在 console 看到成功
-        print("簽章部隊")
+        print("簽章不對")
         return JsonResponse({"status": "invalid-signature-ignored"}, status=200)
     except Exception as e:
         # 其他解析錯誤也先回 200
