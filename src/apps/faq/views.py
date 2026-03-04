@@ -1,4 +1,5 @@
 import os
+from django.conf import settings
 from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from linebot import LineBotApi, WebhookParser
@@ -7,10 +8,27 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage, QuickRepl
 from .models import FAQ
 from rapidfuzz import fuzz, process
 
-CHANNEL_SECRET = os.getenv("LINE_CHANNEL_SECRET")
-CHANNEL_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
-line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
-parser = WebhookParser(CHANNEL_SECRET)
+
+
+def check_channel_config(self) -> None:
+    """
+    Check if the LINE channel configuration is set properly.
+
+    Raises:
+        ValueError: If the LINE channel secret or access token is not set.
+    """
+    if not settings.CHANNEL_SECRET:
+        raise ValueError("LINE_CHANNEL_SECRET is not set.")
+    if not settings.CHANNEL_ACCESS_TOKEN:
+        raise ValueError("LINE_CHANNEL_ACCESS_TOKEN is not set.")
+        
+check_channel_config()
+line_bot_api = LineBotApi(settings.CHANNEL_ACCESS_TOKEN)
+parser = WebhookParser(settings.CHANNEL_SECRET)
+
+
+
+
 
 # 在你的 views 回覆 FAQ 前
 def _send_long_text(line_bot_api, reply_token, text, max_len=1800):
@@ -62,9 +80,9 @@ def _match(user_text: str, faqs):
 
 @csrf_exempt
 def callback(request):
-    # print("SECRET head:", (CHANNEL_SECRET or "")[:6], "len:", len(CHANNEL_SECRET or "0"))
-    # print("TOKEN head:", (CHANNEL_ACCESS_TOKEN or "")[:6], "len:", len(CHANNEL_ACCESS_TOKEN or "0"))
-    if not CHANNEL_SECRET:
+    # print("SECRET head:", (settings.CHANNEL_SECRET or "")[:6], "len:", len(settings.CHANNEL_SECRET or "0"))
+    # print("TOKEN head:", (settings.CHANNEL_ACCESS_TOKEN or "")[:6], "len:", len(settings.CHANNEL_ACCESS_TOKEN or "0"))
+    if not settings.CHANNEL_SECRET:
         raise RuntimeError("LINE_CHANNEL_SECRET is missing. Check .env")
 
     # 只接受 POST；其餘直接回 200

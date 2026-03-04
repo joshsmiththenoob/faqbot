@@ -145,3 +145,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles" # Let Django collects where we put all static files to (ex: project's root folder) when we run the collectstatic commond by manage.py
 # It's going to allow us to host our static files using Nginx
+
+
+
+# LINE Bot API settings
+CHANNEL_SECRET = env.str("LINE_CHANNEL_SECRET", default='')
+CHANNEL_ACCESS_TOKEN = env.str("LINE_CHANNEL_ACCESS_TOKEN", default='')
