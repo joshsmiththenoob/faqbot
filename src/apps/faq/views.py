@@ -1,6 +1,6 @@
 import os
 from django.conf import settings
-from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponse, HttpResponseForbidden, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError
@@ -10,7 +10,7 @@ from rapidfuzz import fuzz, process
 
 
 
-def check_channel_config(self) -> None:
+def check_channel_config() -> None:
     """
     Check if the LINE channel configuration is set properly.
 
@@ -27,6 +27,21 @@ line_bot_api = LineBotApi(settings.CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.CHANNEL_SECRET)
 
 
+def verify_line_signature(request):
+    signature = request.headers.get("X-Line-Signature", "")
+    body = request.body.decode("utf-8") if request.body else ""
+    if not signature:
+        print("Missing X-Line-Signature header.")
+        return False, None
+    try:
+        events = parser.parse(body, signature)
+        return True, events
+    except InvalidSignatureError:
+        print("Invalid signature. Signature does not match.")
+        return False, None
+    except Exception as e:
+        print(f"Error parsing request: {e}")
+        return False, None
 
 
 
@@ -80,8 +95,11 @@ def _match(user_text: str, faqs):
 
 @csrf_exempt
 def callback(request):
+    print(type(request))
+    print(isinstance(request, HttpRequest))
     # print("SECRET head:", (settings.CHANNEL_SECRET or "")[:6], "len:", len(settings.CHANNEL_SECRET or "0"))
     # print("TOKEN head:", (settings.CHANNEL_ACCESS_TOKEN or "")[:6], "len:", len(settings.CHANNEL_ACCESS_TOKEN or "0"))
+    print("-----------收到請求------------", request.method, "\n 請求表頭" , request.headers, "\n body 為: \n ", request.body)
     if not settings.CHANNEL_SECRET:
         raise RuntimeError("LINE_CHANNEL_SECRET is missing. Check .env")
 
@@ -109,7 +127,9 @@ def callback(request):
         # 其他解析錯誤也先回 200
         print("parse error:", e)
         return JsonResponse({"status": "parse-error-ignored"}, status=200)
-
+    # print(events)
+    # print(body)
+    # print(signature)
     faqs = list(FAQ.objects.filter(enabled=True))
     print(faqs)
     # 你的比對邏輯（略）——保留原本 reply 邏輯

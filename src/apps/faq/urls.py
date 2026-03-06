@@ -1,5 +1,5 @@
 from django.urls import path, include
-from apps.faq.views import callback
+from apps.faq.view_test import callback
 
 
 
