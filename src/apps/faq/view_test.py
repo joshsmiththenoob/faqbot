@@ -46,7 +46,8 @@ def callback(request: HttpRequest) -> HttpResponse:
 
     # Get request body as text
     body = request.body.decode("utf-8") if request.body else ""
-    print(request.body)
+    print("type of signature:", type(signature))
+    print("type of body:", type(body))
     
     print("Signature:", signature, "\n", "Type:", type(signature), "\n", "Body:", body, "\n", "Type:", type(body))
     if not signature:

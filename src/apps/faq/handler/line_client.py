@@ -13,7 +13,7 @@ from linebot.v3 import (
     WebhookParser
 )
 
-class LineHandler():
+class LineClient():
     def __init__(self):
         self.__check_channel_config()
 

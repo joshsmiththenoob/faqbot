@@ -6,19 +6,16 @@ Also, it handles the communication with the LINE Messaging API to send responses
 
 import os
 from django.conf import settings
-from faq.handler.line_handler import LineHandler
+from apps.faq.handler.line_client import LineClient
 
 
 
-class FAQService:
+class LineWebhookService():
     def __init__(self):
-        self.line_handler = LineHandler()
+        self.line_handler = LineClient()
         
 
-    def handle_webhook(self, request):
-        # 在這裡處理 LINE Webhook 的回調邏輯
-        signature = request.headers.get("X-Line-Signature", "")
-        body = request.body.decode("utf-8") if (request.body) else ""
+    def handle_webhook(self, body: str, signature: str):
 
         print("Signature:", signature, "\n", "Type:", type(signature), "\n", "Body:", body, "\n", "Type:", type(body))
         
