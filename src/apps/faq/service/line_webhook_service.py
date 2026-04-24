@@ -6,26 +6,36 @@ Also, it handles the communication with the LINE Messaging API to send responses
 
 import os
 from django.conf import settings
+from linebot.v3.webhooks import FollowEvent, MessageEvent
 from apps.faq.handler.line_client import LineClient
 
 
 
-class LineWebhookService():
+class LineWebhookDispatcher():
     def __init__(self):
-        self.line_handler = LineClient()
+        self.line_client = LineClient()
         
 
-    def handle_webhook(self, body: str, signature: str):
+    def handle_webhook(self, body: str, signature: str) -> None:
 
         print("Signature:", signature, "\n", "Type:", type(signature), "\n", "Body:", body, "\n", "Type:", type(body))
         
-        # 這裡可以調用 LineHandler 的方法來處理 webhook 邏輯
-        linebot_api = self.line_handler.line_bot_api
-        parser = self.line_handler.webhook_parser
+        # Get parser from LineClient to handle the webhook request
+        parser = self.line_client.webhook_parser
 
         
-        try:
-            events = parser.parse(body, signature)
-        except Invalid
+        # Get events by parsing the request body and signature
+        events = parser.parse(body, signature)
+
+        # Dispatch each event and handle it accordingly
+        # Example: if there's a MesssageEvent, we can delegate the FAQService to handle the message etc.
+        for event in events:
+            self.dispatch(event)
         
         
+        def dispatch(self, event) -> None:
+            if isinstance(event, FollowEvent):
+                FollowEventHandler().handle(event)
+
+            elif isinstance(event, MessageEvent):
+                MessageEventHandler().handle(event)

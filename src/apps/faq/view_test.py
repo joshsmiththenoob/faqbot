@@ -40,7 +40,9 @@ def callback(request: HttpRequest) -> HttpResponse:
     if (request.method != "POST"):
         return HttpResponseForbidden("Only POST requests are allowed.")
     
+    print("Received request:", request)
 
+    print("Headers: ", request.headers)
     # Get X-Line-Signature header value
     signature = request.headers.get("X-Line-Signature", "")
 

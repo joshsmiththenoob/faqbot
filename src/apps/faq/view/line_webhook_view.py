@@ -1,6 +1,6 @@
 from django.views import View
 from django.http import JsonResponse, HttpResponse, HttpResponseForbidden, HttpRequest
-from apps.faq.service.line_webhook_service import LineWebhookService
+from apps.faq.service.line_webhook_service import LineWebhookDispatcher, 
 from faq.models import FAQ
 
 
@@ -13,10 +13,13 @@ class LineWebhookView(View):
 
         # print("Signature:", signature, "\n", "Type:", type(signature), "\n", "Body:", body, "\n", "Type:", type(body))
         try:
-            webhook_service = LineWebhookService()  # 這裡的 parser 需要根據實際情況傳入
-            # webhook_service.handle_webhook(body, signature)
+            # the main service could be regarded as a dispatcher that dispatches event to different handlers
+            # If event handler process susscessfully, it will send request to LINEBOT Messaging API to reply to user
+            webhook_service.handle_webhook(body, signature)
             return HttpResponse(status=200)
         except Exception as e:
+            # Otherwise it will raise exception and we can log the error for debugging
+            webhook_service = LineWebhookDispatcher()  
             print(f"Error handling request: {e}")
             return HttpResponse(status=500)
         

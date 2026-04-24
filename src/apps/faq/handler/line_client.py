@@ -31,8 +31,10 @@ class LineClient():
         
 
     @property
-    def line_bot_api(self):
-        return MessagingApi(settings.CHANNEL_ACCESS_TOKEN)
+    def api_client(self):
+        configuration = Configuration(access_token=settings.CHANNEL_ACCESS_TOKEN)
+        api_client = ApiClient(configuration)
+        return MessagingApi(api_client)
     
     @property
     def webhook_parser(self):
