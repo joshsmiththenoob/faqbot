@@ -1,8 +1,13 @@
 from django.urls import path, include
-from apps.faq.view_test import callback
+from django.views.decorators.csrf import csrf_exempt
+from apps.faq.view.line_webhook_view import LineWebhookView
 
 
 
 urlpatterns = [
-    path("callback/", callback),  # LINE Webhook URL
+    # LINE Webhook URL -> Line Platform is authenticated by X-Line-Signature header,not CSRF token.
+    # Just exempt CSRF check for this URL(endpoint).
+    path("callback/", csrf_exempt(
+                        LineWebhookView.as_view()
+                        )),  
 ]

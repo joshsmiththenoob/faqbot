@@ -1,13 +1,16 @@
 """
-The Service layer contains the business logic of the FAQ application. 
-It processes data and finds similarity between client's question and the stored FAQs. A
-Also, it handles the communication with the LINE Messaging API to send responses back to the user. 
+Duty
+
+1. parses webhook events from LINE Platform
+2. dispatches each event to the corresponding event handler.
 """
 
 import os
 from django.conf import settings
 from linebot.v3.webhooks import FollowEvent, MessageEvent
 from apps.faq.handler.line_client import LineClient
+from apps.faq.handler.event_handler.follow_event_handler import FollowEventHandler
+from apps.faq.handler.event_handler.message_event_handler import MessageEventHandler
 
 
 
@@ -33,9 +36,9 @@ class LineWebhookDispatcher():
             self.dispatch(event)
         
         
-        def dispatch(self, event) -> None:
-            if isinstance(event, FollowEvent):
-                FollowEventHandler().handle(event)
+    def dispatch(self, event) -> None:
+        if isinstance(event, FollowEvent):
+            FollowEventHandler().handle(event)
 
-            elif isinstance(event, MessageEvent):
-                MessageEventHandler().handle(event)
+        elif isinstance(event, MessageEvent):
+            MessageEventHandler().handle(event)

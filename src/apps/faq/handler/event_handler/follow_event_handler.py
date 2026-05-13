@@ -5,13 +5,17 @@ It receives the event dispatched by the main service then parse it
 and send it to the core service to operate bussiness logic.
 
 """
-from linebot.v3.webhooks import FollowEvent
+from linebot.v3.webhooks import FollowEvent, MessageEvent
+
+from apps.faq.handler.line_client import LineClient
+from apps.faq.service.follow_event_service import FollowEventService
 
 
 
 class FollowEventHandler():
     def __init__(self):
-        pass
+        self.line_client = LineClient()
+        self.follow_event_service = FollowEventService()
 
     def handle(self, event: FollowEvent) -> None:
         reply_token = event.reply_token
@@ -21,11 +25,11 @@ class FollowEventHandler():
 
         print(f"New follower user_id={user_id}")
 
-        welcome_text = """
-            您好，歡迎使用主力農家問題LINE Bot。 \n
-            您可以直接輸入問題，例如: 農業保險、給付標準。\n
-            我們會盡力為您提供相關資訊和協助。 \n
-        """
-
         # send welcome message to user
-        s
+        welcome_message = self.follow_event_service.build_welcome_message()
+
+
+        self.line_client.reply_message(
+            reply_token=reply_token,
+            messages=[welcome_message],
+        )
